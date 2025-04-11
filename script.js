@@ -1,38 +1,44 @@
 //your JS code here. If required.
-let currentPlayer = 1;
-let player1, player2;
-let board = ['', '', '', '', '', '', '', '', ''];
-const winningCombinations = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-];
+document.addEventListener("DOMContentLoaded", () => {
+    const playerForm = document.getElementById("player-form");
+    const gameBoard = document.getElementById("game-board");
+    const submitBtn = document.getElementById("submit");
+    const messageDiv = document.querySelector(".message");
+    const cells = document.querySelectorAll(".cell");
+    const restartBtn = document.getElementById("restart");
 
-document.getElementById('submit').addEventListener('click', function() {
-    player1 = document.getElementById('player-1').value;
-    player2 = document.getElementById('player-2').value;
+    let player1, player2, currentPlayer, gameActive;
+    let boardState = ["", "", "", "", "", "", "", "", ""];
 
-    if (player1 && player2) {
-        document.querySelector('.player-input').style.display = 'none';
-        document.querySelector('.game').style.display = 'block';
-        document.querySelector('.message').textContent = `${player1}, you're up!`;
+    submitBtn.addEventListener("click", () => {
+        player1 = document.getElementById("player-1").value || "Player 1";
+        player2 = document.getElementById("player-2").value || "Player 2";
+        
+        if (player1.trim() === "" || player2.trim() === "") {
+            alert("Please enter names for both players.");
+            return;
+        }
+
+        currentPlayer = player1; // Start with player1
+        gameActive = true;
+        
+        playerForm.style.display = "none";
+        gameBoard.style.display = "block";
+        updateMessage();
+    });
+
+    function updateMessage() {
+        messageDiv.textContent = `${currentPlayer}, you're up!`;
     }
-});
 
-document.querySelectorAll('.cell').forEach(cell => {
-    cell.addEventListener('click', function() {
-        const cellIndex = this.id - 1;
+    function checkWinner() {
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6]  // Diagonals
+        ];
 
-        if (board[cellIndex] === '' && !checkWinner()) {
-            board[cellIndex] = currentPlayer === 1 ? 'X' : 'O';
-            this.textContent = board[cellIndex];
-            if (checkWinner()) {
-                document.querySelector('.message').textContent = `${currentPlayer === 1 ? player1 : player2}, congratulations you won!`;
-            } else {
-                currentPlayer = currentPlayer === 1 ? 2 : 1;
-                document.querySelector('.message').textContent = `${currentPlayer === 1 ? player
+        for (const combo of winningCombinations) {
+            const [a, b, c] = combo;
+            if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+                messageDiv.text
