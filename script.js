@@ -1,4 +1,3 @@
-//your JS code here. If required.
 document.addEventListener("DOMContentLoaded", () => {
     const playerForm = document.getElementById("player-form");
     const gameBoard = document.getElementById("game-board");
@@ -11,17 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
     let boardState = ["", "", "", "", "", "", "", "", ""];
 
     submitBtn.addEventListener("click", () => {
-        player1 = document.getElementById("player-1").value || "Player 1";
-        player2 = document.getElementById("player-2").value || "Player 2";
+        player1 = document.getElementById("player-1").value.trim() || "Player 1";
+        player2 = document.getElementById("player-2").value.trim() || "Player 2";
         
-        if (player1.trim() === "" || player2.trim() === "") {
+        if (!player1 || !player2) {
             alert("Please enter names for both players.");
             return;
         }
 
-        currentPlayer = player1; // Start with player1
+        currentPlayer = player1;
         gameActive = true;
-        
         playerForm.style.display = "none";
         gameBoard.style.display = "block";
         updateMessage();
@@ -41,4 +39,40 @@ document.addEventListener("DOMContentLoaded", () => {
         for (const combo of winningCombinations) {
             const [a, b, c] = combo;
             if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
-                messageDiv.text
+                messageDiv.textContent = `${currentPlayer} wins!`;
+                gameActive = false;
+                restartBtn.style.display = "block";
+                return;
+            }
+        }
+
+        if (!boardState.includes("")) {
+            messageDiv.textContent = "It's a draw!";
+            gameActive = false;
+            restartBtn.style.display = "block";
+        }
+    }
+
+    function handleCellClick(event) {
+        const cellIndex = event.target.id - 1;
+        if (!gameActive || boardState[cellIndex]) return;
+
+        boardState[cellIndex] = currentPlayer === player1 ? "X" : "O";
+        event.target.textContent = boardState[cellIndex];
+
+        checkWinner();
+        currentPlayer = currentPlayer === player1 ? player2 : player1;
+        if (gameActive) updateMessage();
+    }
+
+    cells.forEach(cell => cell.addEventListener("click", handleCellClick));
+
+    restartBtn.addEventListener("click", () => {
+        boardState.fill("");
+        cells.forEach(cell => cell.textContent = "");
+        gameActive = true;
+        restartBtn.style.display = "none";
+        currentPlayer = player1;
+        updateMessage();
+    });
+});
